@@ -14,7 +14,7 @@ const ProductDetails = () => {
 
         try {
             const response = await axios.get(
-                `http://localhost:8080/api/v1/companies/${companyName}/categories/${categoryName}/products`,
+                `http://localhost:3000/companies/:companyname/categories/:categoryname/products`,
                 {
                     params: {
                         top,

@@ -51,33 +51,37 @@ const decodeProductId = (id, productName) => {
 
 router.get('/companies/:companyname/categories/:categoryname/products', async (req, res) => {
     try {
-        const access_token = await authenticate();
+        const authResponse = await axios.post("http://20.244.56.144/test/auth", {
+            "companyName": "affordmed",
+            "clientID": "432067d4-3ad7-4e3a-a16c-bd6148b31519",
+            "clientSecret": "VbVYENSiFtRRXDOi",
+            "ownerName": "A Sai Bharath",
+            "ownerEmail": "asb.bharath601@gmail.com",
+            "rollNo": "245521733130"
+        });
+        const access_token = authResponse.data.access_token;
 
         const { companyname, categoryname } = req.params;
         const { top, minPrice, maxPrice } = req.query;
 
         const productsResponse = await axios.get(`http://20.244.56.144/test/companies/${companyname}/categories/${categoryname}/products`, {
             headers: {
-                Authorization: `Bearer ${access_token}`,
+                Authorization: `Bearer ${access_token}`
             },
             params: {
                 top,
                 minPrice,
-                maxPrice,
-            },
+                maxPrice
+            }
         });
 
-        const productsWithId = productsResponse.data.map(product => ({
-            ...product,
-            id: encodeProductId(product),
-        }));
-
-        return res.json(productsWithId);
+        return res.json(productsResponse.data);
     } catch (error) {
-        console.error('Error:', error.response ? error.response.data : error.message);
-        return res.status(500).json({ error: 'Internal Server Error' });
+        console.error(error);
+        return res.status(500).json("Internal Server Error");
     }
 });
+
 
 
 router.get('/companies/:companyname/categories/:categoryname/products/:productid', async (req, res) => {
@@ -98,7 +102,7 @@ router.get('/companies/:companyname/categories/:categoryname/products/:productid
             return res.status(404).json({ error: 'Product not found' });
         }
 
-        // Encode the product ID
+        
         product.id = encodeProductId(product);
 
         return res.json(product);
